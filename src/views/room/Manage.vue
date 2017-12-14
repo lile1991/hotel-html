@@ -5,11 +5,17 @@
         <el-row :gutter="20">
           <el-col :span="4" v-for="room in rooms">
             <el-card :body-style="{ padding: '0px' }" class="room-card">
-              <span>{{room.number}}</span>
+              <img src="http://element-cn.eleme.io/static/hamburger.50e4091.png" class="image">
+              <div>
+                {{room.alias}}
+              </div>
               <el-button-group class="room-card-option">
-                <el-button type="primary" size="mini" icon="el-icon-search" v-on:click="checkIn(room)">入住</el-button>
-                <el-button type="primary" size="mini" icon="el-icon-search" v-on:click="reserve(room)">预定</el-button>
-                <el-button type="primary" size="mini" icon="el-icon-search" v-on:click="disable(room)">停用</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="checkIn(room)">入住</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'CHECK_IN'" v-on:click="checkIn(room)">离店</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="reserve(room)">预定</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="disable(room)">停用</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'STOP'" v-on:click="enable(room)">启用</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'RESERVE'" v-on:click="checkIn(room)">取消预定</el-button>
               </el-button-group>
             </el-card>
           </el-col>
@@ -34,6 +40,7 @@
     },
     data() {
       return {
+        curTabIndex: 0,
         tabPosition: "left",
         roomTypes: null,
         rooms: null,
@@ -48,21 +55,61 @@
         this.$router.push({ path: '/room/checkIn', room: room})
       },
       reserve(room) {
-        alert("预定")
+        alert("未开发")
       },
       disable(room) {
-        alert("停用")
+        this.$confirm('确定要停用房间' + room.alias + "吗?", room.alias, {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          RoomApi.disable(room.id).then(response => {
+            this.fetchRoomManage();
+            this.$message({
+              type: 'success',
+              message: response.msg
+            });
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消操作'
+          });
+        });
+      },
+      enable(room) {
+        this.$confirm('确定要启用房间' + room.alias + "吗?", room.alias, {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          RoomApi.enable(room.id).then(response => {
+            this.fetchRoomManage();
+            this.$message({
+              type: 'success',
+              message: response.msg
+            });
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消操作'
+          });
+        });
       },
       fetchRoomType() {
         RoomTypeApi.findAll().then(response => {
           this.roomTypes = response.data;
           if(this.roomTypes && this.roomTypes.length > 0) {
-            this.fetchRoomManage({index: 0});
+            this.fetchRoomManage();
           }
         });
       },
       fetchRoomManage(tab) {
-        let roomType = this.roomTypes[tab.index];
+        if(tab) {
+          this.curTabIndex = tab.index;
+        }
+        let roomType = this.roomTypes[this.curTabIndex];
         this.loadingRooms = true;
         RoomApi.findManage({roomType: {id: roomType.id}}).then(response => {
           this.rooms = response.data;
@@ -76,7 +123,7 @@
 
 <style type="text/css">
   .room-container .room-card {
-    background-image: url('http://element-cn.eleme.io/static/hamburger.50e4091.png');
+    /*background-image: url('http://element-cn.eleme.io/static/hamburger.50e4091.png');*/
     padding: 5px;
   }
 

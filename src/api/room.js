@@ -17,6 +17,18 @@ let RoomtApi = {
       method: 'post',
       data: condition
     });
+  },
+  enable: function(id) {
+    return fetch({
+      url: this.fullPage('enable/' + id),
+      method: 'get'
+    });
+  },
+  disable: function(id) {
+    return fetch({
+      url: this.fullPage('disable/' + id),
+      method: 'get'
+    });
   }
 }
 

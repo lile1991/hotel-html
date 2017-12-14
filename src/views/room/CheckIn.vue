@@ -133,7 +133,6 @@
         checkInVo.checkInTime = this.checkInTimeRanges[0];
         checkInVo.checkOutTime = this.checkInTimeRanges[1];
         checkInVo.checkInCustomerList = this.checkInCustomerList;
-        console.log("入住信息: " + JSON.stringify(this.checkInVo));
         this.$refs[formName].validate((valid) => {
           console.log(valid);
           if (valid) {
