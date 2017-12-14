@@ -1,35 +1,53 @@
 <template>
   <div class="check-record-container">
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
-      <el-table-column align="center" label='ID' width="95">
+    <el-table :data="checkRecords" v-loading.body="checkRecordsLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
+      <el-table-column label="房间" width="110" align="center">
         <template slot-scope="scope">
-          {{scope.$index}}
+          <span>{{scope.row.room.id}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Title">
+      <el-table-column label="状态" width="100" align="center"
+                       :filters="[{ text: '家', value: '家' }, { text: '公司', value: '公司' }]"
+                       :filter-method="filterTag"
+                       filter-placement="bottom-end">
         <template slot-scope="scope">
-          {{scope.row.title}}
+          {{scope.row.state}}
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
+      <el-table-column label="手机号" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{scope.row.author}}</span>
+          {{scope.row.customer}}
         </template>
       </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
+      <el-table-column label="入住时间" width="210" align="center">
         <template slot-scope="scope">
-          {{scope.row.pageviews}}
+          {{scope.row.checkInTime}}
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
+      <el-table-column label="离店时间" width="210" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
+          {{scope.row.checkOutTime}}
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
+      <el-table-column label="创建时间" width="210" align="center">
         <template slot-scope="scope">
-          <i class="el-icon-time"></i>
-          <span>{{scope.row.display_time}}</span>
+          {{scope.row.createTime}}
+        </template>
+      </el-table-column>
+      <el-table-column label="创建人" width="100" align="center">
+        <template slot-scope="scope">
+          {{scope.row.createUser.id}}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="200" align="center">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -37,13 +55,13 @@
 </template>
 
 <script>
-  import { getList } from '@/api/table'
+  import { CheckRecordApi } from '@/api/checkRecord'
 
   export default {
     data() {
       return {
-        list: null,
-        listLoading: true
+        checkRecords: [],
+        checkRecordsLoading: false
       }
     },
     filters: {
@@ -52,19 +70,27 @@
           published: 'success',
           draft: 'gray',
           deleted: 'danger'
-        }
+        };
         return statusMap[status]
       }
     },
     created() {
-      this.fetchData()
+      this.fetchCheckRecord();
     },
     methods: {
-      fetchData() {
-        this.listLoading = true
-        getList(this.listQuery).then(response => {
-          this.list = response.data.items
-          this.listLoading = false
+      filterTag(status) {
+        const statusMap = {
+          published: 'success',
+          draft: 'gray',
+          deleted: 'danger'
+        };
+        return statusMap[status]
+      }
+      fetchCheckRecord() {
+        this.checkRecordsLoading = true;
+        CheckRecordApi.findManage({}).then(response => {
+          this.checkRecords = response.data.content;
+          this.checkRecordsLoading = false;
         })
       }
     }

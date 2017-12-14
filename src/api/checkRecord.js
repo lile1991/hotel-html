@@ -10,6 +10,13 @@ let CheckRecordApi = {
       method: 'post',
       data: data
     });
+  },
+  findManage: function(data) {
+    return fetch({
+      url: this.fullPage('findManage'),
+      method: 'post',
+      data: data
+    });
   }
 }
 
