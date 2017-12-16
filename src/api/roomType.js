@@ -10,6 +10,6 @@ let RoomTypeApi = {
       method: 'get'
     });
   }
-}
+};
 
 export default RoomTypeApi;

@@ -30,6 +30,6 @@ let RoomtApi = {
       method: 'get'
     });
   }
-}
+};
 
 export default RoomtApi;

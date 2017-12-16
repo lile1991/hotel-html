@@ -11,11 +11,11 @@
               </div>
               <el-button-group class="room-card-option">
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="checkIn(room)">入住</el-button>
-                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'CHECK_IN'" v-on:click="checkIn(room)">离店</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'CHECK_IN'" v-on:click="leave(room)">退房</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="reserve(room)">预定</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="disable(room)">停用</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'STOP'" v-on:click="enable(room)">启用</el-button>
-                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'RESERVE'" v-on:click="checkIn(room)">取消预定</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'RESERVE'" v-on:click="cancelReserve(room)">取消预定</el-button>
               </el-button-group>
             </el-card>
           </el-col>
@@ -54,7 +54,13 @@
       checkIn(room) {
         this.$router.push({ path: '/room/checkIn', room: room})
       },
+      leave(room) {
+        alert("离店");
+      },
       reserve(room) {
+        alert("未开发")
+      },
+      cancelReserve(room) {
         alert("未开发")
       },
       disable(room) {

@@ -17,7 +17,19 @@ let CheckRecordApi = {
       method: 'post',
       data: data
     });
+  },
+  leave: function(id) {
+    return fetch({
+      url: this.fullPage('leave/' + id),
+      method: 'get'
+    });
+  },
+  reserveCheckIn: function(id) {
+    return fetch({
+      url: this.fullPage('reserveCheckIn/' + id),
+      method: 'get'
+    });
   }
-}
+};
 
 export default CheckRecordApi;

@@ -1,9 +1,23 @@
 <template>
   <div class="check-record-container">
+    <el-form :inline="true" :model="condition" class="demo-form-inline">
+      <el-form-item label="审批人">
+        <el-input v-model="condition.user" placeholder="审批人"></el-input>
+      </el-form-item>
+      <el-form-item label="活动区域">
+        <el-select v-model="condition.region" placeholder="活动区域">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">查询</el-button>
+      </el-form-item>
+    </el-form>
     <el-table :data="checkRecords" v-loading.body="checkRecordsLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
       <el-table-column label="房间" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{scope.row.room.id}}</span>
+          <span>{{scope.row.room.alias}}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" width="100" align="center"
@@ -36,18 +50,14 @@
       </el-table-column>
       <el-table-column label="创建人" width="100" align="center">
         <template slot-scope="scope">
-          {{scope.row.createUser.id}}
+          {{scope.row.createUser.name}}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="leave(scope.row)">退房</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="replace(scope.row)">换房</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -55,11 +65,12 @@
 </template>
 
 <script>
-  import { CheckRecordApi } from '@/api/checkRecord'
+  import CheckRecordApi from '@/api/checkRecord'
 
   export default {
     data() {
       return {
+        condition: {},
         checkRecords: [],
         checkRecordsLoading: false
       }
@@ -78,6 +89,25 @@
       this.fetchCheckRecord();
     },
     methods: {
+      reserveCheckIn(checkRecord) {
+        CheckRecordApi.reserveCheckIn(checkRecord.id).then(response => {
+          this.$message({
+            type: 'success',
+            message: response.msg
+          });
+        });
+      },
+      leave(checkRecord) {
+        CheckRecordApi.leave(checkRecord.id).then(response => {
+          this.$message({
+            type: 'success',
+            message: response.msg
+          });
+        });
+      },
+      replace(checkRecord) {
+        alert("功能开发中");
+      },
       filterTag(status) {
         const statusMap = {
           published: 'success',
@@ -85,7 +115,7 @@
           deleted: 'danger'
         };
         return statusMap[status]
-      }
+      },
       fetchCheckRecord() {
         this.checkRecordsLoading = true;
         CheckRecordApi.findManage({}).then(response => {
