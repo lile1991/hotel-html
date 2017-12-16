@@ -1,13 +1,22 @@
 <template>
   <div class="check-record-container">
     <el-form :inline="true" :model="condition" class="demo-form-inline">
-      <el-form-item label="审批人">
-        <el-input v-model="condition.user" placeholder="审批人"></el-input>
+      <el-form-item label="登记手机号">
+        <el-input v-model="condition.user" placeholder="任意入住人手机号"></el-input>
       </el-form-item>
-      <el-form-item label="活动区域">
-        <el-select v-model="condition.region" placeholder="活动区域">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
+      <el-form-item label="状态">
+        <el-select v-model="condition.region" placeholder="入住状态">
+          <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name" v-for="checkStateEnum in checkStateEnums"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="入住时间">
+        <el-select v-model="condition.region" placeholder="入住状态">
+          <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name" v-for="checkStateEnum in checkStateEnums"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="登记时间">
+        <el-select v-model="condition.region" placeholder="入住状态">
+          <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name" v-for="checkStateEnum in checkStateEnums"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -20,10 +29,15 @@
           <span>{{scope.row.room.alias}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="100" align="center"
-                       :filters="[{ text: '家', value: '家' }, { text: '公司', value: '公司' }]"
-                       :filter-method="filterTag"
-                       filter-placement="bottom-end">
+      <!--:filters="[
+        { text: '已预定', value: 'RESERVE' },
+        { text: '已取消预定', value: 'CANCELED_RESERVE' },
+        { text: '已入住', value: 'CHECK_IN' },
+        { text: '已退房', value: 'LEFT' }
+      ]"
+      :filter-method="filterRecordState"
+      filter-placement="bottom-end"-->
+      <el-table-column label="状态" width="100" align="center">
         <template slot-scope="scope">
           {{scope.row.stateDesc}}
         </template>
@@ -35,17 +49,17 @@
       </el-table-column>
       <el-table-column label="入住时间" width="210" align="center">
         <template slot-scope="scope">
-          {{scope.row.checkInTime | timestamp2Date("YYYY-MM-DD HH:mm")}}
+          {{scope.row.checkInTime | dateFormat("YYYY-MM-DD HH:mm")}}
         </template>
       </el-table-column>
       <el-table-column label="离店时间" width="210" align="center">
         <template slot-scope="scope">
-          {{scope.row.checkOutTime | timestamp2Date("YYYY-MM-DD HH:mm")}}
+          {{scope.row.checkOutTime | dateFormat("YYYY-MM-DD HH:mm")}}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" width="210" align="center">
         <template slot-scope="scope">
-          {{scope.row.createTime | timestamp2Date}}
+          {{scope.row.createTime | dateFormat}}
         </template>
       </el-table-column>
       <el-table-column label="创建人" width="100" align="center">
@@ -55,8 +69,8 @@
       </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="leave(scope.row)">退房</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住(交押金等等)</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="leave(scope.row)">退房(扣除押金等等)</el-button>
           <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="replace(scope.row)">换房</el-button>
         </template>
       </el-table-column>
@@ -72,6 +86,7 @@
       return {
         condition: {},
         checkRecords: [],
+        checkStateEnums: [],
         checkRecordsLoading: false
       }
     },
@@ -87,8 +102,14 @@
     },
     created() {
       this.fetchCheckRecord();
+      this.getCheckStateEnums();
     },
     methods: {
+      getCheckStateEnums() {
+        CheckRecordApi.getCheckStateEnums().then(response => {
+          this.checkStateEnums = response.data;
+        })
+      },
       reserveCheckIn(checkRecord) {
         CheckRecordApi.reserveCheckIn(checkRecord.id).then(response => {
           this.$message({
@@ -108,13 +129,13 @@
       replace(checkRecord) {
         alert("功能开发中");
       },
-      filterTag(status) {
-        const statusMap = {
+      filterRecordState(state) {
+        /*const statusMap = {
           published: 'success',
           draft: 'gray',
           deleted: 'danger'
-        };
-        return statusMap[status]
+        };*/
+        // return statusMap[state]
       },
       fetchCheckRecord() {
         this.checkRecordsLoading = true;
