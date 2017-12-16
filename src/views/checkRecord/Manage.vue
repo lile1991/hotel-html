@@ -25,7 +25,7 @@
                        :filter-method="filterTag"
                        filter-placement="bottom-end">
         <template slot-scope="scope">
-          {{scope.row.state}}
+          {{scope.row.stateDesc}}
         </template>
       </el-table-column>
       <el-table-column label="手机号" width="110" align="center">
@@ -35,17 +35,17 @@
       </el-table-column>
       <el-table-column label="入住时间" width="210" align="center">
         <template slot-scope="scope">
-          {{scope.row.checkInTime}}
+          {{scope.row.checkInTime | timestamp2Date("YYYY-MM-DD HH:mm")}}
         </template>
       </el-table-column>
       <el-table-column label="离店时间" width="210" align="center">
         <template slot-scope="scope">
-          {{scope.row.checkOutTime}}
+          {{scope.row.checkOutTime | timestamp2Date("YYYY-MM-DD HH:mm")}}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" width="210" align="center">
         <template slot-scope="scope">
-          {{scope.row.createTime}}
+          {{scope.row.createTime | timestamp2Date}}
         </template>
       </el-table-column>
       <el-table-column label="创建人" width="100" align="center">

@@ -7,10 +7,17 @@ import router from './router'
 import store from './store'
 import '@/icons' // icon
 import '@/permission' // 权限
+import './utils/filters'
 
 Vue.use(ElementUI, { locale });
 
 Vue.config.productionTip = false;
+
+/*Vue.filter(
+  "timestamp2Date", function (value) {
+      return value ? new Date(value) : "";
+  }
+);*/
 
 new Vue({
   el: '#app',
