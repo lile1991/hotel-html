@@ -11,7 +11,7 @@
               </div>
               <el-button-group class="room-card-option">
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="checkIn(room)">入住</el-button>
-                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'CHECK_IN'" v-on:click="leave(room)">退房</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'CHECK_IN'" v-on:click="checkOut(room)">退房</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="reserve(room)">预定</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'EMPTY'" v-on:click="disable(room)">停用</el-button>
                 <el-button type="primary" size="mini" icon="el-icon-search" v-if="room.state === 'STOP'" v-on:click="enable(room)">启用</el-button>
@@ -54,14 +54,14 @@
       checkIn(room) {
         this.$router.push({ path: '/room/checkIn', room: room})
       },
-      leave(room) {
-        alert("离店");
+      checkOut(room) {
+        this.$router.push({ path: '/room/checkOut', room: room})
       },
       reserve(room) {
-        alert("未开发")
+        alert("开发中")
       },
       cancelReserve(room) {
-        alert("未开发")
+        alert("开发中")
       },
       disable(room) {
         this.$confirm('确定要停用房间' + room.alias + "吗?", room.alias, {

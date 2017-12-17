@@ -1,78 +1,147 @@
 <template>
-  <div class="room-container">
-    <el-tabs :tab-position="tabPosition">
-      <el-tab-pane :label="roomType" v-for="roomType in roomTypes">
-        <el-row :gutter="20">
-          <el-col :span="4" v-for="room in rooms">
-            <el-card :body-style="{ padding: '0px' }" class="room-card">
-              <span>{{room.number}}</span>
-              <el-button-group class="room-card-option">
-                <el-button type="primary" size="mini" icon="el-icon-search" v-on:click="checkIn(room)">入住</el-button>
-                <el-button type="primary" size="mini" icon="el-icon-search" v-on:click="reserve(room)">预定</el-button>
-                <el-button type="primary" size="mini" icon="el-icon-search" v-on:click="disable(room)">停用</el-button>
-              </el-button-group>
-            </el-card>
-          </el-col>
-        </el-row>
-      </el-tab-pane>
-    </el-tabs>
+  <div>
+    <el-form :model="checkInVo" :rules="checkInRules" ref="checknOutForm" label-width="100px">
+      <el-form-item label="房间类型" prop="roomTypeId" required>
+      </el-form-item>
+      <el-form-item label="入住房间" prop="roomId" required>
+      </el-form-item>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="应付房费">
+            <el-input v-model.number="selectedRoom.charge" disabled></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="实付房费" prop="payedCharge" required>
+            <el-input v-model.number="checkInVo.payedCharge"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="应付押金">
+            <el-input v-model.number="selectedRoom.deposit" disabled></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="实付押金" prop="payedDeposit" required>
+            <el-input v-model.number="checkInVo.payedDeposit"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-form-item label="入住日期" required>
+        xx-xx
+      </el-form-item>
+
+
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('checknOutForm')">退房/取消预定</el-button>
+        <el-button @click="resetForm('checknOutForm')">重置</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
 <script>
   import {mapGetters} from 'vuex'
+  import RoomApi from '@/api/room'
+  import RoomTypeApi from '@/api/roomType'
+  import CheckRecordApi from '@/api/checkRecord'
 
   export default {
-    name: 'RoomManage',
-    computed: {
-      ...mapGetters([
-        'name',
-        'roles'
-      ])
-    },
     data() {
       return {
-        tabPosition: "left",
-        roomTypes: [
-          "标准单间",
-          "豪华单间",
-          "标准双间",
-          "豪华双间"
-        ],
-        rooms: [
-          {
-            number: "101",
-            state: "入住"
-          },
-          {
-            number: "102",
-            state: "空置"
-          }
-        ]
-      }
+        selectedRoom: {
+          deposit: null,
+          charge: null
+        },
+        roomTypes: [],
+        rooms: [],
+        checkInTimeRanges: [null, null],
+        checkOutVo: {
+          roomTypeId: null,
+          roomId: null,
+          payedCharge: null,
+          payedDeposit: null
+        },
+        checkInCustomerList: [{}],
+        checkInRules: {
+          roomTypeId: [
+            {required: true, message: '请选择房间类型', trigger: 'blur'}
+          ],
+          roomId: [
+            {required: true, message: '请选择入住房间', trigger: 'blur'}
+          ],
+          payedCharge: [
+            {required: true, message: '请输入实付房费', trigger: 'blur'},
+            {type: "number", message: '实付房费必须为数字', trigger: 'blur'}
+          ],
+          payedDeposit: [
+            {required: true, message: '请输入实付押金', trigger: 'blur'},
+            {type: "number", message: '实付押金必须为数字', trigger: 'blur'}
+          ],
+          checkInTimeRanges: [
+            {type: 'array', required: true, message: '请选择入住日期', trigger: 'change'}
+          ]
+        }
+      };
+    },
+    created() {
+      this.loadRoomTypes();
     },
     methods: {
-      checkIn(room) {
-        alert("入住" + room.number)
+      submitForm(formName) {
+        let checkInVo = this.checkInVo;
+        checkInVo.checkInTime = this.checkInTimeRanges[0];
+        checkInVo.checkOutTime = this.checkInTimeRanges[1];
+        checkInVo.checkInCustomerList = this.checkInCustomerList;
+        this.$refs[formName].validate((valid) => {
+          console.log(valid);
+          if (valid) {
+            CheckRecordApi.checkIn(checkInVo).then(response => {
+              this.$message({
+                type: 'success',
+                message: response
+              }.msg);
+              this.$router.push({ path: '/room/manage'})
+            });
+          } else {
+            this.$message.error("信息录入有误");
+            return false;
+          }
+        });
       },
-      reserve(room) {
-        alert("预定")
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
       },
-      disable(room) {
-        alert("停用")
+      loadRooms() {
+        if (this.checkInVo.roomTypeId) {
+          RoomApi.findAll({roomType: {id: this.checkInVo.roomTypeId}}).then(response => {
+            this.rooms = response.data;
+          });
+        }
+      },
+      loadRoomTypes() {
+        RoomTypeApi.findAll().then(response => {
+          this.roomTypes = response.data;
+        });
+      },
+      changeRoom() {
+        let selectedRoomId = this.checkInVo.roomId;
+        for (let room of this.rooms) {
+          if (room.id === selectedRoomId) {
+            this.selectedRoom = room;
+            break
+          }
+        }
+      },
+      addCheckInCustomer() {
+        this.checkInCustomerList.push({});
+      },
+      removeCheckInCustomer(index) {
+        this.checkInCustomerList.splice(index, 1);
       }
     }
   }
-
 </script>
-
-<style type="text/css">
-  .room-container .room-card {
-    background-image: url('http://element-cn.eleme.io/static/hamburger.50e4091.png');
-    padding: 5px;
-  }
-
-  .room-card-option button {
-    padding: 3px;
-  }
-</style>

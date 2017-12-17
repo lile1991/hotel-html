@@ -4,20 +4,30 @@
       <el-form-item label="登记手机号">
         <el-input v-model="condition.user" placeholder="任意入住人手机号"></el-input>
       </el-form-item>
+      <el-form-item label="创建人">
+        <el-input v-model="condition.user" placeholder="登记人姓名"></el-input>
+      </el-form-item>
       <el-form-item label="状态">
         <el-select v-model="condition.region" placeholder="入住状态">
           <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name" v-for="checkStateEnum in checkStateEnums"></el-option>
         </el-select>
       </el-form-item>
+      <br />
       <el-form-item label="入住时间">
-        <el-select v-model="condition.region" placeholder="入住状态">
-          <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name" v-for="checkStateEnum in checkStateEnums"></el-option>
-        </el-select>
+        <el-date-picker
+          v-model="value4"
+          type="datetimerange"
+          :picker-options="pickerOptions"
+          align="right">
+        </el-date-picker>
       </el-form-item>
       <el-form-item label="登记时间">
-        <el-select v-model="condition.region" placeholder="入住状态">
-          <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name" v-for="checkStateEnum in checkStateEnums"></el-option>
-        </el-select>
+        <el-date-picker
+          v-model="value4"
+          type="datetimerange"
+          :picker-options="pickerOptions"
+          align="right">
+        </el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -70,7 +80,7 @@
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住(交押金等等)</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="leave(scope.row)">退房(扣除押金等等)</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="checkOut(scope.row)">退房(扣除押金等等)</el-button>
           <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="replace(scope.row)">换房</el-button>
         </template>
       </el-table-column>
@@ -87,7 +97,34 @@
         condition: {},
         checkRecords: [],
         checkStateEnums: [],
-        checkRecordsLoading: false
+        checkRecordsLoading: false,
+        pickerOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        }
       }
     },
     filters: {
@@ -118,7 +155,8 @@
           });
         });
       },
-      leave(checkRecord) {
+      checkOut(checkRecord) {
+        this.$router.push({ path: '/room/checkOut', room: room})
         CheckRecordApi.leave(checkRecord.id).then(response => {
           this.$message({
             type: 'success',
