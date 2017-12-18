@@ -55,7 +55,7 @@
         this.$router.push({ path: '/room/checkIn', room: room})
       },
       checkOut(room) {
-        this.$router.push({ path: '/room/checkOut', room: room})
+        // this.$router.push({ path: '/room/checkOut', params: {checkRecordId}})
       },
       reserve(room) {
         alert("开发中")

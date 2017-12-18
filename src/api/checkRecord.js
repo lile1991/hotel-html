@@ -24,6 +24,12 @@ let CheckRecordApi = {
       method: 'get'
     });
   },
+  findCheckOut: function(id) {
+    return fetch({
+      url: this.fullPage('findCheckOut/' + id),
+      method: 'get'
+    });
+  },
   getCheckStateEnums: function() {
     return fetch({
       url: this.fullPage('getCheckStateEnums'),

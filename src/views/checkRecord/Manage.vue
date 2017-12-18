@@ -156,13 +156,13 @@
         });
       },
       checkOut(checkRecord) {
-        this.$router.push({ path: '/room/checkOut', room: room})
-        CheckRecordApi.leave(checkRecord.id).then(response => {
+        this.$router.push({ path: '/room/checkOut/' + checkRecord.id});
+        /*CheckRecordApi.leave(checkRecord.id).then(response => {
           this.$message({
             type: 'success',
             message: response.msg
           });
-        });
+        });*/
       },
       replace(checkRecord) {
         alert("功能开发中");
