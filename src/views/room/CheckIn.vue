@@ -47,7 +47,7 @@
       </el-form-item>
 
 
-      <el-row :gutter="20" v-for="(checkInCustomer, index) in checkInCustomerList">
+      <el-row :gutter="20" v-for="(checkInCustomer, index) in checkInCustomers">
         <el-col :span="6">
           <el-form-item label="客户姓名" required>
             <el-input v-model="checkInCustomer.name" :rules="[{ required: true, message: '请填写客户姓名'}]"></el-input>
@@ -65,7 +65,7 @@
         </el-col>
         <el-col :span="6">
           <el-button type="primary" v-on:click="addCheckInCustomer"
-                     v-if="index === checkInCustomerList.length - 1">添加入住人员
+                     v-if="index === checkInCustomers.length - 1">添加入住人员
           </el-button>
           <el-button type="danger" v-on:click="removeCheckInCustomer(index)" v-else>删除</el-button>
         </el-col>
@@ -102,7 +102,7 @@
           payedCharge: null,
           payedDeposit: null
         },
-        checkInCustomerList: [{}],
+        checkInCustomers: [{}],
         checkInRules: {
           roomTypeId: [
             {required: true, message: '请选择房间类型', trigger: 'blur'}
@@ -131,8 +131,8 @@
       submitForm(formName) {
         let checkInVo = this.checkInVo;
         checkInVo.checkInTime = this.checkInTimeRanges[0];
-        checkInVo.checkOutTime = this.checkInTimeRanges[1];
-        checkInVo.checkInCustomerList = this.checkInCustomerList;
+        checkInVo.overTime = this.checkInTimeRanges[1];
+        checkInVo.checkInCustomers = this.checkInCustomers;
         this.$refs[formName].validate((valid) => {
           console.log(valid);
           if (valid) {
@@ -156,6 +156,7 @@
         if (this.checkInVo.roomTypeId) {
           RoomApi.findAll({roomType: {id: this.checkInVo.roomTypeId}}).then(response => {
             this.rooms = response.data;
+            this.checkInVo.roomId = null;
           });
         }
       },
@@ -174,10 +175,10 @@
         }
       },
       addCheckInCustomer() {
-        this.checkInCustomerList.push({});
+        this.checkInCustomers.push({});
       },
       removeCheckInCustomer(index) {
-        this.checkInCustomerList.splice(index, 1);
+        this.checkInCustomers.splice(index, 1);
       }
     }
   }
