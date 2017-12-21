@@ -1,8 +1,8 @@
 import fetch from '@/utils/fetch'
 
-let CheckRecordApi = {
+let CheckInRecordApi = {
   fullPage: function(path) {
-    return "/checkRecord/" + path;
+    return "/checkInRecord/" + path;
   },
   checkIn: function(data) {
     return fetch({
@@ -16,18 +16,6 @@ let CheckRecordApi = {
       url: this.fullPage('findManage'),
       method: 'post',
       data: data
-    });
-  },
-  leave: function(id) {
-    return fetch({
-      url: this.fullPage('leave/' + id),
-      method: 'get'
-    });
-  },
-  findCheckOut: function(id) {
-    return fetch({
-      url: this.fullPage('findCheckOut/' + id),
-      method: 'get'
     });
   },
   getCheckStateEnums: function() {
@@ -44,4 +32,4 @@ let CheckRecordApi = {
   }
 };
 
-export default CheckRecordApi;
+export default CheckInRecordApi;

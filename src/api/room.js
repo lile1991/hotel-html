@@ -18,6 +18,12 @@ let RoomtApi = {
       data: condition
     });
   },
+  findCheckIn: function(id) {
+    return fetch({
+      url: this.fullPage('findCheckIn/' + id),
+      method: 'get'
+    });
+  },
   enable: function(id) {
     return fetch({
       url: this.fullPage('enable/' + id),

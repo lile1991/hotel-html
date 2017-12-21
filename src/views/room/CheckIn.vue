@@ -2,15 +2,19 @@
   <div>
     <el-form :model="checkInVo" :rules="checkInRules" ref="checkInForm" label-width="100px">
       <el-form-item label="房间类型" prop="roomTypeId" required>
-        <el-select v-model.number="checkInVo.roomTypeId" placeholder="请选择" v-on:change="loadRooms">
-          <el-option v-for="roomType in roomTypes" :key="roomType.id" :value="roomType.id" :label="roomType.name"/>
+        <el-select v-model.number="checkInVo.roomTypeId" placeholder="请选择" v-on:change="loadRooms" :disabled="isSelectedRoom">
+          <el-option v-for="roomType in roomTypes" :key="roomType.id" :value="roomType.id" :label="roomType.name" v-if="isSelectedRoom"/>
+          <el-option :key="selectedRoom.roomType.id" :value="selectedRoom.roomType.id" :label="selectedRoom.roomType.name" v-else/>
         </el-select>
       </el-form-item>
+
       <el-form-item label="入住房间" prop="roomId" required>
-        <el-select v-model.number="checkInVo.roomId" placeholder="请选择" v-on:change="changeRoom">
-          <el-option v-for="room in rooms" :key="room.id" :value="room.id" :label="room.alias"/>
+        <el-select v-model.number="checkInVo.roomId" placeholder="请选择" v-on:change="changeRoom" :disabled="isSelectedRoom">
+          <el-option v-for="room in rooms" :key="room.id" :value="room.id" :label="room.alias" v-if="isSelectedRoom"/>
+          <el-option :key="selectedRoom.id" :value="selectedRoom.id" :label="selectedRoom.alias" v-else/>
         </el-select>
       </el-form-item>
+
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="应付房费">
@@ -84,11 +88,12 @@
   import {mapGetters} from 'vuex'
   import RoomApi from '@/api/room'
   import RoomTypeApi from '@/api/roomType'
-  import CheckRecordApi from '@/api/checkRecord'
+  import CheckInRecordApi from '@/api/checkInRecord'
 
   export default {
     data() {
       return {
+        isSelectedRoom: false,
         selectedRoom: {
           deposit: null,
           charge: null
@@ -125,7 +130,13 @@
       };
     },
     created() {
-      this.loadRoomTypes();
+      let roomId = this.$route.params["roomId"];
+      if(roomId) {
+        this.isSelectedRoom = true;
+        this.loadSelectedRoom(roomId);
+      } else {
+        this.loadRoomTypes();
+      }
     },
     methods: {
       submitForm(formName) {
@@ -134,9 +145,8 @@
         checkInVo.overTime = this.checkInTimeRanges[1];
         checkInVo.checkInCustomers = this.checkInCustomers;
         this.$refs[formName].validate((valid) => {
-          console.log(valid);
           if (valid) {
-            CheckRecordApi.checkIn(checkInVo).then(response => {
+            CheckInRecordApi.checkIn(checkInVo).then(response => {
               this.$message({
                 type: 'success',
                 message: response
@@ -152,6 +162,13 @@
       resetForm(formName) {
         this.$refs[formName].resetFields();
       },
+      // 加载房间类型列表
+      loadRoomTypes() {
+        RoomTypeApi.findAll().then(response => {
+          this.roomTypes = response.data;
+        });
+      },
+      // 加载房间列表
       loadRooms() {
         if (this.checkInVo.roomTypeId) {
           RoomApi.findAll({roomType: {id: this.checkInVo.roomTypeId}}).then(response => {
@@ -160,11 +177,7 @@
           });
         }
       },
-      loadRoomTypes() {
-        RoomTypeApi.findAll().then(response => {
-          this.roomTypes = response.data;
-        });
-      },
+      // 改变房间
       changeRoom() {
         let selectedRoomId = this.checkInVo.roomId;
         for (let room of this.rooms) {
@@ -174,6 +187,17 @@
           }
         }
       },
+
+      // 加载指定房间 (选定房间入住)
+      loadSelectedRoom(roomId) {
+        RoomApi.findCheckIn(roomId).then(response => {
+          this.selectedRoom = response.data;
+
+          this.checkInVo.roomTypeId = this.selectedRoom.roomType.id;
+          this.checkInVo.roomId = roomId;
+        });
+      },
+
       addCheckInCustomer() {
         this.checkInCustomers.push({});
       },

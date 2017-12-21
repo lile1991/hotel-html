@@ -48,7 +48,7 @@
   import {mapGetters} from 'vuex'
   import RoomApi from '@/api/room'
   import RoomTypeApi from '@/api/roomType'
-  import CheckRecordApi from '@/api/checkRecord'
+  import CheckOutRecordApi from '@/api/checkOutRecord'
 
   export default {
     data() {
@@ -81,7 +81,7 @@
         this.$refs[formName].validate((valid) => {
           console.log(valid);
           if (valid) {
-            CheckRecordApi.checkIn(checkOutVo).then(response => {
+            CheckOutRecordApi.checkOut(checkOutVo).then(response => {
               this.$message({
                 type: 'success',
                 message: response
@@ -98,7 +98,7 @@
         this.$refs[formName].resetFields();
       },
       loadCheckRecord(id) {
-        CheckRecordApi.findCheckOut(id).then(response => {
+        CheckOutRecordApi.findOne(id).then(response => {
           this.checkRecord = response.data;
         });
       }

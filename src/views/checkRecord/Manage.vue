@@ -89,7 +89,7 @@
 </template>
 
 <script>
-  import CheckRecordApi from '@/api/checkRecord'
+  import CheckInRecordApi from '@/api/checkInRecord'
 
   export default {
     data() {
@@ -138,17 +138,17 @@
       }
     },
     created() {
-      this.fetchCheckRecord();
+      this.fetchCheckInRecord();
       this.getCheckStateEnums();
     },
     methods: {
       getCheckStateEnums() {
-        CheckRecordApi.getCheckStateEnums().then(response => {
+        CheckInRecordApi.getCheckStateEnums().then(response => {
           this.checkStateEnums = response.data;
         })
       },
       reserveCheckIn(checkRecord) {
-        CheckRecordApi.reserveCheckIn(checkRecord.id).then(response => {
+        CheckInRecordApi.reserveCheckIn(checkRecord.id).then(response => {
           this.$message({
             type: 'success',
             message: response.msg
@@ -157,7 +157,7 @@
       },
       checkOut(checkRecord) {
         this.$router.push({ path: '/room/checkOut/' + checkRecord.id});
-        /*CheckRecordApi.leave(checkRecord.id).then(response => {
+        /*CheckInRecordApi.leave(checkRecord.id).then(response => {
           this.$message({
             type: 'success',
             message: response.msg
@@ -175,9 +175,9 @@
         };*/
         // return statusMap[state]
       },
-      fetchCheckRecord() {
+      fetchCheckInRecord() {
         this.checkRecordsLoading = true;
-        CheckRecordApi.findManage({}).then(response => {
+        CheckInRecordApi.findManage({}).then(response => {
           this.checkRecords = response.data.content;
           this.checkRecordsLoading = false;
         })
