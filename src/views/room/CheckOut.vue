@@ -2,12 +2,12 @@
   <div>
     <el-form :model="checkOutVo" :rules="checkOutRules" ref="checknOutForm" label-width="100px">
       <el-form-item label="房间">
-        {{checkRecord.room.alias}}
+        {{checkInRecord.room.alias}}
       </el-form-item>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="实付房费">
-            {{checkRecord.payedCharge}}
+            {{checkInRecord.payedCharge}}
           </el-form-item>
         </el-col>
       </el-row>
@@ -15,7 +15,7 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="实付押金">
-            {{checkRecord.payedDeposit}}
+            {{checkInRecord.payedDeposit}}
           </el-form-item>
 
           <el-form-item label="扣除押金" required>
@@ -54,8 +54,8 @@
     data() {
       return {
         rooms: [],
-        checkRecord: {
-
+        checkInRecord: {
+          room: {}
         },
         checkOutVo: {
           roomTypeId: null,
@@ -70,7 +70,7 @@
       };
     },
     created() {
-      this.loadCheckRecord(this.$route.params.id);
+      this.loadcheckInRecord(this.$route.params.id);
     },
     methods: {
       submitForm(formName) {
@@ -97,9 +97,9 @@
       resetForm(formName) {
         this.$refs[formName].resetFields();
       },
-      loadCheckRecord(id) {
+      loadcheckInRecord(id) {
         CheckOutRecordApi.findOne(id).then(response => {
-          this.checkRecord = response.data;
+          this.checkInRecord = response.data;
         });
       }
     }
