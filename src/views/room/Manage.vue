@@ -52,7 +52,7 @@
     },
     methods: {
       checkIn(room) {
-        this.$router.push({ path: '/room/checkIn/' + room.id})
+        this.$router.push({ path: '/room/checkIn/' + room.roomType.id + "/" + room.id})
       },
       checkOut(room) {
         // this.$router.push({ path: '/room/checkOut', params: {checkRecordId}})

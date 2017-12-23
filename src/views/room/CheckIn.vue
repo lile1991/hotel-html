@@ -2,16 +2,14 @@
   <div>
     <el-form :model="checkInVo" :rules="checkInRules" ref="checkInForm" label-width="100px">
       <el-form-item label="房间类型" prop="roomTypeId" required>
-        <el-select v-model.number="checkInVo.roomTypeId" placeholder="请选择" v-on:change="loadRooms" :disabled="isSelectedRoom">
-          <el-option v-for="roomType in roomTypes" :key="roomType.id" :value="roomType.id" :label="roomType.name" v-if="isSelectedRoom"/>
-          <el-option :key="selectedRoom.roomType.id" :value="selectedRoom.roomType.id" :label="selectedRoom.roomType.name" v-else/>
+        <el-select v-model.number="checkInVo.roomTypeId" placeholder="请选择" v-on:change="loadRooms">
+          <el-option v-for="roomType in roomTypes" :key="roomType.id" :value="roomType.id" :label="roomType.name"/>
         </el-select>
       </el-form-item>
 
       <el-form-item label="入住房间" prop="roomId" required>
-        <el-select v-model.number="checkInVo.roomId" placeholder="请选择" v-on:change="changeRoom" :disabled="isSelectedRoom">
-          <el-option v-for="room in rooms" :key="room.id" :value="room.id" :label="room.alias" v-if="isSelectedRoom"/>
-          <el-option :key="selectedRoom.id" :value="selectedRoom.id" :label="selectedRoom.alias" v-else/>
+        <el-select v-model.number="checkInVo.roomId" placeholder="请选择" v-on:change="changeRoom">
+          <el-option v-for="room in rooms" :key="room.id" :value="room.id" :label="room.alias"/>
         </el-select>
       </el-form-item>
 
@@ -129,14 +127,31 @@
         }
       };
     },
+    beforeRouteEnter(to, from, next) {
+      let roomId = to.params["roomId"];
+      next(vm => {
+        // 通过 `vm` 访问组件实例
+        vm.isSelectedRoom = Boolean(roomId);
+      });
+    },
     created() {
-      let roomId = this.$route.params["roomId"];
-      if(roomId) {
-        this.isSelectedRoom = true;
-        this.loadSelectedRoom(roomId);
-      } else {
-        this.loadRoomTypes();
-      }
+      let roomTypeId = parseInt(this.$route.params["roomTypeId"]);
+      let roomId = parseInt(this.$route.params["roomId"]);
+
+      let checkInVo = this.checkInVo;
+
+      this.loadRoomTypes().then(data => {
+        if (roomTypeId) {
+          checkInVo.roomTypeId = roomTypeId;
+
+          this.loadRooms().then(data => {
+            if (roomId) {
+              checkInVo.roomId = roomId;
+              this.changeRoom();
+            }
+          });
+        }
+      });
     },
     methods: {
       submitForm(formName) {
@@ -149,9 +164,9 @@
             CheckInRecordApi.checkIn(checkInVo).then(response => {
               this.$message({
                 type: 'success',
-                message: response
+                message: response.msg
               }.msg);
-              this.$router.push({ path: '/room/manage'})
+              this.$router.push({path: '/room/manage'})
             });
           } else {
             this.$message.error("信息录入有误");
@@ -164,18 +179,24 @@
       },
       // 加载房间类型列表
       loadRoomTypes() {
-        RoomTypeApi.findAll().then(response => {
-          this.roomTypes = response.data;
+        return new Promise(resolve => {
+          RoomTypeApi.findAll().then(response => {
+            this.roomTypes = response.data;
+            resolve(response);
+          });
         });
       },
       // 加载房间列表
       loadRooms() {
-        if (this.checkInVo.roomTypeId) {
-          RoomApi.findAll({roomType: {id: this.checkInVo.roomTypeId}}).then(response => {
-            this.rooms = response.data;
-            this.checkInVo.roomId = null;
-          });
-        }
+        return new Promise(resolve => {
+          if (this.checkInVo.roomTypeId) {
+            RoomApi.findAll({roomType: {id: this.checkInVo.roomTypeId}}).then(response => {
+              this.rooms = response.data;
+              this.checkInVo.roomId = null;
+              resolve(response);
+            });
+          }
+        })
       },
       // 改变房间
       changeRoom() {
@@ -186,16 +207,6 @@
             break
           }
         }
-      },
-
-      // 加载指定房间 (选定房间入住)
-      loadSelectedRoom(roomId) {
-        RoomApi.findCheckIn(roomId).then(response => {
-          this.selectedRoom = response.data;
-
-          this.checkInVo.roomTypeId = this.selectedRoom.roomType.id;
-          this.checkInVo.roomId = roomId;
-        });
       },
 
       addCheckInCustomer() {
