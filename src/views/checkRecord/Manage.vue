@@ -15,7 +15,7 @@
       <br />
       <el-form-item label="入住时间">
         <el-date-picker
-          v-model="value4"
+          v-model="checkInTimeRange"
           type="datetimerange"
           :picker-options="pickerOptions"
           align="right">
@@ -23,7 +23,7 @@
       </el-form-item>
       <el-form-item label="登记时间">
         <el-date-picker
-          v-model="value4"
+          v-model="createTimeRange"
           type="datetimerange"
           :picker-options="pickerOptions"
           align="right">
@@ -33,7 +33,7 @@
         <el-button type="primary" @click="onSubmit">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="checkRecords" v-loading.body="checkRecordsLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
+    <el-table :data="checkInRecords" v-loading.body="checkInRecordsLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
       <el-table-column label="房间" width="110" align="center">
         <template slot-scope="scope">
           <span>{{scope.row.room.alias}}</span>
@@ -79,8 +79,8 @@
       </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住(交押金等等)</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="checkOut(scope.row)">退房(扣除押金等等)</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="checkOut(scope.row)">退房</el-button>
           <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="replace(scope.row)">换房</el-button>
         </template>
       </el-table-column>
@@ -95,9 +95,11 @@
     data() {
       return {
         condition: {},
-        checkRecords: [],
+        checkInRecords: [],
         checkStateEnums: [],
-        checkRecordsLoading: false,
+        checkInRecordsLoading: false,
+        checkInTimeRange: [],
+        createTimeRange: [],
         pickerOptions: {
           shortcuts: [{
             text: '最近一周',
@@ -156,7 +158,7 @@
         });
       },
       checkOut(checkRecord) {
-        this.$router.push({ path: '/room/checkOut/' + checkRecord.id});
+        this.$router.push({ path: '/checkRecord/checkOut/' + checkRecord.id});
         /*CheckInRecordApi.leave(checkRecord.id).then(response => {
           this.$message({
             type: 'success',
@@ -176,10 +178,10 @@
         // return statusMap[state]
       },
       fetchCheckInRecord() {
-        this.checkRecordsLoading = true;
+        this.checkInRecordsLoading = true;
         CheckInRecordApi.findManage({}).then(response => {
-          this.checkRecords = response.data.content;
-          this.checkRecordsLoading = false;
+          this.checkInRecords = response.data.content;
+          this.checkInRecordsLoading = false;
         })
       }
     }

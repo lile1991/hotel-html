@@ -29,6 +29,12 @@ let CheckInRecordApi = {
       url: this.fullPage('reserveCheckIn/' + id),
       method: 'get'
     });
+  },
+  findFromCheckOut: function(id) {
+    return fetch({
+      url: this.fullPage('findFromCheckOut/' + id),
+      method: 'get'
+    });
   }
 };
 

@@ -48,12 +48,12 @@
   import {mapGetters} from 'vuex'
   import RoomApi from '@/api/room'
   import RoomTypeApi from '@/api/roomType'
+  import CheckInRecordApi from '@/api/checkInRecord'
   import CheckOutRecordApi from '@/api/checkOutRecord'
 
   export default {
     data() {
       return {
-        rooms: [],
         checkInRecord: {
           room: {}
         },
@@ -70,7 +70,7 @@
       };
     },
     created() {
-      this.loadcheckInRecord(this.$route.params.id);
+      this.loadCheckInRecord(this.$route.params.checkInRecordId);
     },
     methods: {
       submitForm(formName) {
@@ -97,8 +97,8 @@
       resetForm(formName) {
         this.$refs[formName].resetFields();
       },
-      loadcheckInRecord(id) {
-        CheckOutRecordApi.findOne(id).then(response => {
+      loadCheckInRecord(id) {
+        CheckInRecordApi.findFromCheckOut(id).then(response => {
           this.checkInRecord = response.data;
         });
       }
