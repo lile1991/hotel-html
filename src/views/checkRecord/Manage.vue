@@ -8,32 +8,46 @@
         <el-input v-model="condition.user" placeholder="登记人姓名"></el-input>
       </el-form-item>
       <el-form-item label="状态">
-        <el-select v-model="condition.region" placeholder="入住状态">
-          <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name" v-for="checkStateEnum in checkStateEnums"></el-option>
+        <el-select v-model="condition.state" placeholder="入住状态">
+          <el-option :label="checkStateEnum.desc" :value="checkStateEnum.name"
+                     v-for="checkStateEnum in checkStateEnums"></el-option>
         </el-select>
       </el-form-item>
-      <br />
+      <br/>
       <el-form-item label="入住时间">
         <el-date-picker
-          v-model="checkInTimeRange"
-          type="datetimerange"
-          :picker-options="pickerOptions"
-          align="right">
+          v-model="condition.checkInTimeBegin"
+          type="datetime"
+          placeholder="起始">
+        </el-date-picker>
+        -
+        <el-date-picker
+          v-model="condition.checkInTimeEnd"
+          type="datetime"
+          placeholder="结束">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="登记时间">
         <el-date-picker
-          v-model="createTimeRange"
-          type="datetimerange"
-          :picker-options="pickerOptions"
-          align="right">
+          v-model="condition.createTimeBegin"
+          type="datetime"
+          placeholder="起始">
+        </el-date-picker>
+        -
+        <el-date-picker
+          v-model="condition.createTimeEnd"
+          type="datetime"
+          placeholder="结束">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary" @click="fetchCheckInRecord">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="checkInRecords" v-loading.body="checkInRecordsLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
+
+
+    <el-table :data="pageData.content" v-loading.body="checkInRecordsLoading" element-loading-text="拼命加载中" border fit
+              highlight-current-row>
       <el-table-column label="房间" width="110" align="center">
         <template slot-scope="scope">
           <span>{{scope.row.room.alias}}</span>
@@ -84,12 +98,28 @@
       </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="checkOut(scope.row)">退房</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'" v-on:click="replace(scope.row)">换房</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'"
+                     v-on:click="reserveCheckIn(scope.row)">预约入住
+          </el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'"
+                     v-on:click="checkOut(scope.row)">退房
+          </el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'"
+                     v-on:click="replace(scope.row)">换房
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="condition.page"
+      :page-sizes="[20, 50, 80, 100]"
+      :page-size="condition.size"
+      layout="sizes, prev, pager, next, jumper, total"
+      :total="pageData.totalElements">
+    </el-pagination>
   </div>
 </template>
 
@@ -99,12 +129,20 @@
   export default {
     data() {
       return {
-        condition: {},
-        checkInRecords: [],
+        condition: {
+          page: 1,
+          size: 20,
+          checkInTimeBegin: null,
+          checkInTimeEnd: null,
+          createTimeBegin: null,
+          createTimeEnd: null,
+          state: null
+        },
+        pageData: {
+          totalElements: 0
+        },
         checkStateEnums: [],
         checkInRecordsLoading: false,
-        checkInTimeRange: [],
-        createTimeRange: [],
         pickerOptions: {
           shortcuts: [{
             text: '最近一周',
@@ -163,7 +201,7 @@
         });
       },
       checkOut(checkRecord) {
-        this.$router.push({ path: '/checkRecord/checkOut/' + checkRecord.id});
+        this.$router.push({path: '/checkRecord/checkOut/' + checkRecord.id});
         /*CheckInRecordApi.leave(checkRecord.id).then(response => {
           this.$message({
             type: 'success',
@@ -184,10 +222,18 @@
       },
       fetchCheckInRecord() {
         this.checkInRecordsLoading = true;
-        CheckInRecordApi.findManage({}).then(response => {
-          this.checkInRecords = response.data.content;
+        CheckInRecordApi.findManage(this.condition).then(response => {
+          this.pageData = response.data;
           this.checkInRecordsLoading = false;
         })
+      },
+      handleSizeChange(size) {
+        this.condition.size = size;
+        this.fetchCheckInRecord();
+      },
+      handleCurrentChange(page) {
+        this.condition.page = page;
+        this.fetchCheckInRecord();
       }
     }
   }
