@@ -77,6 +77,11 @@
           {{scope.row.createUser.name}}
         </template>
       </el-table-column>
+      <el-table-column label="更新人" width="100" align="center">
+        <template slot-scope="scope">
+          {{scope.row.updateUser.name}}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'" v-on:click="reserveCheckIn(scope.row)">预约入住</el-button>

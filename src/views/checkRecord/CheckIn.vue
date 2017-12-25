@@ -13,41 +13,44 @@
         </el-select>
       </el-form-item>
 
-      <el-row :gutter="20">
-        <el-col :span="12">
+      <el-row :gutter="12">
+        <el-col :span="6">
           <el-form-item label="应付房费">
-            <el-input v-model.number="selectedRoom.charge" disabled></el-input>
+            {{selectedRoom.charge | amount}}
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="6">
           <el-form-item label="实付房费" prop="payedCharge" required>
             <el-input v-model.number="checkInVo.payedCharge"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
 
-      <el-row :gutter="20">
-        <el-col :span="12">
+      <el-row :gutter="12">
+        <el-col :span="6">
           <el-form-item label="应付押金">
-            <el-input v-model.number="selectedRoom.deposit" disabled></el-input>
+            {{selectedRoom.deposit | amount}}
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="6">
           <el-form-item label="实付押金" prop="payedDeposit" required>
             <el-input v-model.number="checkInVo.payedDeposit"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
-      <el-form-item label="入住日期" required>
-        <el-date-picker
-          v-model="checkInTimeRanges"
-          type="datetimerange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期">
-        </el-date-picker>
-      </el-form-item>
-
+      <el-row :gutter="12">
+        <el-col :span="12">
+          <el-form-item label="入住日期" required>
+            <el-date-picker
+              v-model="checkInTimeRanges"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-row>
 
       <el-row :gutter="20" v-for="(checkInCustomer, index) in checkInCustomers">
         <el-col :span="6">
@@ -163,9 +166,9 @@
           if (valid) {
             CheckInRecordApi.checkIn(checkInVo).then(response => {
               this.$message({
-                type: 'success',
-                message: response.msg
-              }.msg);
+                message: response.msg,
+                type: 'success'
+              });
               this.$router.push({path: '/room/manage'})
             });
           } else {

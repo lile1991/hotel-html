@@ -117,7 +117,7 @@
         }
         let roomType = this.roomTypes[this.curTabIndex];
         this.loadingRooms = true;
-        RoomApi.findManage({roomType: {id: roomType.id}}).then(response => {
+        RoomApi.findManage({roomTypeId: roomType.id}).then(response => {
           this.rooms = response.data;
           this.loadingRooms = false;
         });
