@@ -51,6 +51,13 @@
           </el-form-item>
         </el-col>
       </el-row>
+      <el-row :gutter="12">
+        <el-col :span="12">
+          <el-form-item label="预留手机号" required>
+            <el-input v-model="checkInVo.mobile"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
 
       <el-row :gutter="20" v-for="(checkInCustomer, index) in checkInCustomers">
         <el-col :span="6">
@@ -64,7 +71,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="手机号">
+          <el-form-item label="手机号(选填)">
             <el-input v-model="checkInCustomer.mobile"></el-input>
           </el-form-item>
         </el-col>
@@ -105,6 +112,7 @@
         checkInVo: {
           roomTypeId: null,
           roomId: null,
+          mobile: null,
           payedCharge: null,
           payedDeposit: null
         },
@@ -115,6 +123,9 @@
           ],
           roomId: [
             {required: true, message: '请选择入住房间', trigger: 'blur'}
+          ],
+          mobile: [
+            {required: true, message: '请输入客户预留手机号', trigger: 'blur'}
           ],
           payedCharge: [
             {required: true, message: '请输入实付房费', trigger: 'blur'},
@@ -162,6 +173,10 @@
         checkInVo.checkInTime = this.checkInTimeRanges[0];
         checkInVo.overTime = this.checkInTimeRanges[1];
         checkInVo.checkInCustomers = this.checkInCustomers;
+        if(! checkInVo.checkInCustomers || checkInVo.checkInCustomers.length == 0) {
+          this.$message.error("请至少登记一个住户");
+        }
+
         this.$refs[formName].validate((valid) => {
           if (valid) {
             CheckInRecordApi.checkIn(checkInVo).then(response => {

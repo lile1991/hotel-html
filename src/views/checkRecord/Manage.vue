@@ -4,8 +4,11 @@
       <el-form-item label="登记手机号">
         <el-input v-model="condition.user" placeholder="任意入住人手机号"></el-input>
       </el-form-item>
+      <el-form-item label="入住人">
+        <el-input v-model="condition.checkInCustomerName" placeholder="姓名"></el-input>
+      </el-form-item>
       <el-form-item label="创建人">
-        <el-input v-model="condition.user" placeholder="登记人姓名"></el-input>
+        <el-input v-model="condition.user" placeholder="创建人姓名"></el-input>
       </el-form-item>
       <el-form-item label="状态">
         <el-select v-model="condition.state" placeholder="入住状态">
@@ -136,6 +139,7 @@
           checkInTimeEnd: null,
           createTimeBegin: null,
           createTimeEnd: null,
+          checkInCustomerName: null,
           state: null
         },
         pageData: {
