@@ -33,9 +33,32 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <el-form-item label="入住日期" required>
+
+      <el-form-item label="预留手机号">
+        {{checkInRecord.mobile}}
+      </el-form-item>
+
+      <el-form-item label="入住日期">
         {{checkInRecord.checkInTime | dateFormat}} - {{checkInRecord.overTime | dateFormat}}
       </el-form-item>
+
+      <el-row :gutter="20" v-for="checkInCustomer in checkInRecord.checkInCustomers">
+        <el-col :span="6">
+          <el-form-item label="客户姓名">
+            {{checkInCustomer.name}}
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="身份证号">
+            {{checkInCustomer.idCard}}
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="手机号">
+            {{checkInCustomer.mobile}}
+          </el-form-item>
+        </el-col>
+      </el-row>
 
       <el-row>
         <el-col :span="6">
@@ -119,7 +142,7 @@
         this.$refs[formName].resetFields();
       },
       loadCheckInRecord(id) {
-        CheckInRecordApi.detail(id).then(response => {
+        CheckInRecordApi.findDetail(id).then(response => {
           this.checkInRecord = response.data;
           this.checkOutVo.checkInId = this.checkInRecord.id;
         });
