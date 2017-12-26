@@ -119,7 +119,7 @@
         this.$refs[formName].resetFields();
       },
       loadCheckInRecord(id) {
-        CheckInRecordApi.findFromCheckOut(id).then(response => {
+        CheckInRecordApi.detail(id).then(response => {
           this.checkInRecord = response.data;
           this.checkOutVo.checkInId = this.checkInRecord.id;
         });

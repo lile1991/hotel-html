@@ -40,7 +40,8 @@ export const constantRouterMap = [
       { path: 'checkIn/:roomTypeId/:roomId', name: '入住登记', component: _import('checkRecord/CheckIn'), props: true, hidden: true },
       { path: 'checkIn', name: '入住登记', component: _import('checkRecord/CheckIn'), props: true },
       { path: 'manage', name: '入住记录', component: _import('checkRecord/Manage') },
-      { path: 'checkOut/:checkInRecordId', name: '退房', component: _import('checkRecord/CheckOut'), props: true}
+      { path: 'detail/:checkInRecordId', name: '入住详情', component: _import('checkRecord/CheckRecordDetail'), hidden: true },
+      { path: 'checkOut/:checkInRecordId', name: '退房', component: _import('checkRecord/CheckOut'), props: true, hidden: true}
     ]
   },
 

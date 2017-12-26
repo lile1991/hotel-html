@@ -101,14 +101,16 @@
       </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'RESERVE'"
+          <el-button type="primary" size="mini" icon="el-icon-goods" v-if="scope.row.state === 'RESERVE'"
                      v-on:click="reserveCheckIn(scope.row)">预约入住
           </el-button>
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'"
+          <el-button type="danger" size="mini" icon="el-icon-sold-out" v-if="scope.row.state === 'CHECK_IN'"
                      v-on:click="checkOut(scope.row)">退房
           </el-button>
-          <el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'"
+          <!--<el-button type="primary" size="mini" icon="el-icon-search" v-if="scope.row.state === 'CHECK_IN'"
                      v-on:click="replace(scope.row)">换房
+          </el-button>-->
+          <el-button type="primary" size="mini" icon="el-icon-info" v-on:click="detail(scope.row)">详情
           </el-button>
         </template>
       </el-table-column>
@@ -215,6 +217,9 @@
       },
       replace(checkRecord) {
         alert("功能开发中");
+      },
+      detail(checkRecord) {
+        this.$router.push({path: '/checkRecord/detail/' + checkRecord.id});
       },
       filterRecordState(state) {
         /*const statusMap = {

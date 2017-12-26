@@ -30,9 +30,9 @@ let CheckInRecordApi = {
       method: 'get'
     });
   },
-  findFromCheckOut: function(id) {
+  findDetail: function(id) {
     return fetch({
-      url: this.fullPage('findFromCheckOut/' + id),
+      url: this.fullPage('findDetail/' + id),
       method: 'get'
     });
   }
