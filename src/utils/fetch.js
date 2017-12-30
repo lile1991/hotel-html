@@ -6,15 +6,16 @@ import {getToken} from '@/utils/auth'
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
-  timeout: 15000                  // 请求超时时间
-})
+  timeout: 15000,                  // 请求超时时间
+  withCredentials: false // 不允许携带cookie
+});
 
 // request拦截器
 service.interceptors.request.use(config => {
   if (store.getters.token) {
-    config.headers['X-Token'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    config.headers['H-Token'] = getToken()  // 让每个请求携带自定义token 请根据实际情况自行修改
   }
-  return config
+  return config;
 }, error => {
   // Do something with request error
   console.log(error) // for debug
