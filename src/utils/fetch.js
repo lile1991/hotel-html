@@ -7,14 +7,16 @@ import {getToken} from '@/utils/auth'
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
   timeout: 15000,                  // 请求超时时间
-  withCredentials: false // 不允许携带cookie
+  withCredentials: true // 允许携带cookie
 });
 
 // request拦截器
 service.interceptors.request.use(config => {
-  if (store.getters.token) {
+  /*if (store.getters.token) {
+    // Object.assign(config.headers, { 'H-Token': getToken() });
     config.headers['H-Token'] = getToken()  // 让每个请求携带自定义token 请根据实际情况自行修改
-  }
+    // config.headers.Authorization = `token ${store.state.token}`;
+  }*/
   return config;
 }, error => {
   // Do something with request error
