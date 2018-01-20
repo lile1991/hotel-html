@@ -45,7 +45,7 @@ export const constantRouterMap = [
     ]
   },
 
-  {
+  /*{
     path: '/example',
     component: Layout,
     redirect: 'noredirect',
@@ -56,7 +56,7 @@ export const constantRouterMap = [
       { path: 'index', name: '取消预约', icon: 'zonghe', component: _import('page/form') },
       { path: 'index', name: '预约管理', icon: 'zonghe', component: _import('page/form') }
     ]
-  },
+  },*/
 
   /*{
     path: '/table',
