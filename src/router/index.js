@@ -58,14 +58,15 @@ export const constantRouterMap = [
     ]
   },*/
 
-  /*{
-    path: '/table',
+  {
+    path: '/system',
     component: Layout,
-    redirect: '/table/index',
+    // redirect: '/table/index',
     icon: 'tubiao',
-    noDropdown: true,
-    children: [{ path: 'index', name: 'Table', component: _import('table/index'), meta: { role: ['admin'] }}]
-  },*/
+    name: '系统管理',
+    // noDropdown: true,
+    children: [{ path: 'user/manage', name: '用户管理', component: _import('user/Manage')}]
+  },
 
   { path: '*', redirect: '/404', hidden: true }
 ]
