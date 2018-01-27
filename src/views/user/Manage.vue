@@ -45,7 +45,7 @@
                      v-on:click="lock(scope.row)">禁用
           </el-button>
 
-          <el-button type="primary" size="mini" icon="el-icon-info" v-on:click="grantAuth(scope.row)">授权
+          <el-button type="primary" size="mini" icon="el-icon-info" v-on:click="showGrantAuth(scope.row)">授权
           </el-button>
         </template>
       </el-table-column>
@@ -60,6 +60,21 @@
       layout="sizes, prev, pager, next, jumper, total"
       :total="pageData.totalElements">
     </el-pagination>
+
+
+
+    <el-dialog title="用户授权" :visible.sync="grantAuthFormVisible">
+      <el-tree
+            ref="resourceTree"
+            :data="resources"
+            show-checkbox
+            node-key="id">
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="grantAuthFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="grantAuth()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -76,7 +91,41 @@
         pageData: {
           totalElements: 0
         },
-        usersLoading: false
+        usersLoading: false,
+        grantAuthFormVisible: false,
+        selectedUser: null,
+        resources: [
+            {
+                id: 1,
+                label: '一级 1',
+                children: [{
+                    id: 4,
+                    label: '二级 1-1',
+                    children: [{
+                        id: 9,
+                        label: '三级 1-1-1'
+                    }, {
+                        id: 10,
+                        label: '三级 1-1-2'
+                    }]
+                }]
+            },
+            {
+                id: 1,
+                label: '一级 2',
+                children: [{
+                    id: 4,
+                    label: '二级 2-1',
+                    children: [{
+                        id: 9,
+                        label: '三级 2-1-1'
+                    }, {
+                        id: 10,
+                        label: '三级 2-1-2'
+                    }]
+                }]
+            }
+        ]
       }
     },
     filters: {
@@ -93,7 +142,7 @@
         })
       },
       lock(user) {
-          this.$confirm('确定要启用用户' + user.name + "吗?", user.name, {
+          this.$confirm('确定要禁用用户' + user.name + "吗?", user.name, {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'warning'
@@ -113,7 +162,7 @@
           });
       },
       unlock(user) {
-          this.$confirm('确定要禁用用户' + user.name + "吗?", user.name, {
+          this.$confirm('确定要启用用户' + user.name + "吗?", user.name, {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'warning'
@@ -132,8 +181,14 @@
               });
           });
       },
-      grantAuth(user) {
-
+      showGrantAuth(user) {
+          this.selectedUser = user;
+          this.grantAuthFormVisible = true;
+      },
+      grantAuth() {
+          this.grantAuthFormVisible = false;
+          let user = this.selectedUser;
+          console.log(this.$refs.resourceTree.getCheckedKeys());
       },
       handleSizeChange(size) {
         this.condition.size = size;
