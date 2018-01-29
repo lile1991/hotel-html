@@ -66,7 +66,8 @@
     <el-dialog title="用户授权" :visible.sync="grantAuthFormVisible">
       <el-tree
             ref="resourceTree"
-            :data="resources"
+            :data="resourceTree"
+            :props="resourceProps"
             show-checkbox
             node-key="id">
       </el-tree>
@@ -80,6 +81,8 @@
 
 <script>
   import UserApi from '@/api/user'
+  import UserResourceApi from '@/api/userResource'
+  import ResourceApi from '@/api/resource'
 
   export default {
     data() {
@@ -94,44 +97,18 @@
         usersLoading: false,
         grantAuthFormVisible: false,
         selectedUser: null,
-        resources: [
-            {
-                id: 1,
-                label: '一级 1',
-                children: [{
-                    id: 4,
-                    label: '二级 1-1',
-                    children: [{
-                        id: 9,
-                        label: '三级 1-1-1'
-                    }, {
-                        id: 10,
-                        label: '三级 1-1-2'
-                    }]
-                }]
-            },
-            {
-                id: 1,
-                label: '一级 2',
-                children: [{
-                    id: 4,
-                    label: '二级 2-1',
-                    children: [{
-                        id: 9,
-                        label: '三级 2-1-1'
-                    }, {
-                        id: 10,
-                        label: '三级 2-1-2'
-                    }]
-                }]
-            }
-        ]
+        resourceTree: [],
+        resourceProps: {
+            label: "name",
+            children: 'children'
+        }
       }
     },
     filters: {
     },
     created() {
       this.fetchUsers();
+      this.fetchResourceTree();
     },
     methods: {
       fetchUsers() {
@@ -140,6 +117,11 @@
           this.pageData = response.data;
           this.usersLoading = false;
         })
+      },
+      fetchResourceTree() {
+          ResourceApi.findTree().then(response => {
+             this.resourceTree = response.data;
+          });
       },
       lock(user) {
           this.$confirm('确定要禁用用户' + user.name + "吗?", user.name, {
