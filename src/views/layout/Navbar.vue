@@ -1,24 +1,39 @@
 <template>
-    <el-menu class="navbar" mode="horizontal">
-        <!--左上角显示隐藏侧边栏-->
-        <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
-        <!--右上角个人图标-->
-        <el-dropdown class="avatar-container" trigger="click">
-            <div class="avatar-wrapper">
-                <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
-                <i class="el-icon-caret-bottom"></i>
-            </div>
-            <el-dropdown-menu class="user-dropdown" slot="dropdown">
-                <router-link class='inlineBlock' to="/">
-                    <el-dropdown-item>
-                        首页
+    <div>
+        <el-menu class="navbar" mode="horizontal">
+            <!--左上角显示隐藏侧边栏-->
+            <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
+            <!--右上角个人图标-->
+            <el-dropdown class="avatar-container" trigger="click">
+                <div class="avatar-wrapper">
+                    <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
+                    <i class="el-icon-caret-bottom"></i>
+                </div>
+                <el-dropdown-menu class="user-dropdown" slot="dropdown">
+                    <router-link class='inlineBlock' to="/">
+                        <el-dropdown-item>
+                            首页
+                        </el-dropdown-item>
+                    </router-link>
+                    <el-dropdown-item divided><span @click="logout" style="display:block;">LogOut</span>
                     </el-dropdown-item>
-                </router-link>
-                <el-dropdown-item divided><span @click="logout" style="display:block;">LogOut</span></el-dropdown-item>
-            </el-dropdown-menu>
-        </el-dropdown>
+                </el-dropdown-menu>
+            </el-dropdown>
 
-        <el-tabs type="card" closable @tab-remove="removeTab">
+            <!--面包屑导航-->
+            <el-breadcrumb class="app-levelbar" separator-class="el-icon-arrow-right">
+                <el-breadcrumb-item v-for="(item,index)  in levelList" :key="item.path">
+                    <router-link v-if='item.redirect==="noredirect"||index==levelList.length-1' to=""
+                                 class="no-redirect">
+                        {{item.name}}
+                    </router-link>
+                    <router-link v-else :to="item.redirect||item.path">{{item.name}}</router-link>
+                </el-breadcrumb-item>
+            </el-breadcrumb>
+        </el-menu>
+
+
+        <el-tabs type="card" closable @tab-remove="removeTab" @tab-click="clickTab">
             <el-tab-pane
                     v-model="activeTabName"
                     v-for="(item, index) in tabs"
@@ -26,19 +41,10 @@
                     :label="item.name"
                     :name="item.path"
             >
-                <!--面包屑导航-->
-                <el-breadcrumb class="app-levelbar" separator="/">
-                    <el-breadcrumb-item v-for="(item,index)  in levelList" :key="item.path">
-                        <router-link v-if='item.redirect==="noredirect"||index==levelList.length-1' to=""
-                                     class="no-redirect">
-                            {{item.name}}
-                        </router-link>
-                        <router-link v-else :to="item.redirect||item.path">{{item.name}}</router-link>
-                    </el-breadcrumb-item>
-                </el-breadcrumb>
             </el-tab-pane>
+
         </el-tabs>
-    </el-menu>
+    </div>
 </template>
 
 <script>
@@ -81,19 +87,21 @@
                 let matched = this.$route.matched.filter(item => item.name)
                 let lastMatch = matched[matched.length - 1]
 
-                debugger
-                let exists = false;
-                let tabs = this.$store.state.app.tabs
+                let exists = false
+                let tabs = this.$store.getters.tabs
                 tabs.forEach((tab, index) => {
                     if (tab.path === lastMatch.path) {
                         exists = true
                         return true;
                     }
                 });
-                if(! exists) {
+                if (!exists) {
                     this.$store.commit('ADD_TAB', lastMatch)
                 }
                 this.activeTabName = lastMatch.path
+            },
+            clickTab(tab) {
+                this.$router.push({path: tab.name})
             },
             removeTab(targetName) {
                 let tabs = this.$store.app.tabs
@@ -133,7 +141,7 @@
     .app-levelbar.el-breadcrumb {
         display: inline-block;
         font-size: 14px;
-        line-height: 50px;
+        line-height: 40px;
         margin-left: 10px;
         .no-redirect {
             color: #97a8be;

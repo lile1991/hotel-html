@@ -16,3 +16,9 @@
         }
     }
 </script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+    .app-main {
+        margin-left: 15px;
+    }
+</style>
