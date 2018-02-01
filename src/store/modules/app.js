@@ -4,7 +4,8 @@ const app = {
   state: {
     sidebar: {
       opened: !+Cookies.get('sidebarStatus')
-    }
+    },
+    tabs: []
   },
   mutations: {
     TOGGLE_SIDEBAR: state => {
@@ -14,6 +15,12 @@ const app = {
         Cookies.set('sidebarStatus', 0)
       }
       state.sidebar.opened = !state.sidebar.opened
+    },
+    ADD_TAB: (state, newTab) => {
+        state.tabs.push(newTab);
+    },
+    REMOVE_TAB: (state, targetName) => {
+        state.tabs = state.tabs.filter(tab => tab.name !== targetName)
     }
   },
   actions: {
