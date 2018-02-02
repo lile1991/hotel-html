@@ -33,9 +33,8 @@
         </el-menu>
 
 
-        <el-tabs type="card" closable @tab-remove="removeTab" @tab-click="clickTab">
+        <el-tabs type="card" v-model="activeTabName" closable @tab-remove="removeTab" @tab-click="clickTab">
             <el-tab-pane
-                    v-model="activeTabName"
                     v-for="(item, index) in tabs"
                     :key="item.path"
                     :label="item.name"
