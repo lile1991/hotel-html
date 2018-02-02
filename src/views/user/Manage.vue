@@ -107,8 +107,8 @@
     filters: {
     },
     created() {
-      this.fetchUsers();
-      this.fetchResourceTree();
+      this.fetchUsers()
+      this.fetchResourceTree()
     },
     methods: {
       fetchUsers() {
@@ -121,7 +121,7 @@
       fetchResourceTree() {
           ResourceApi.findTree().then(response => {
              this.resourceTree = response.data;
-          });
+          })
       },
       lock(user) {
           this.$confirm('确定要禁用用户' + user.name + "吗?", user.name, {
@@ -140,8 +140,8 @@
               this.$message({
                   type: 'info',
                   message: '已取消操作'
-              });
-          });
+              })
+          })
       },
       unlock(user) {
           this.$confirm('确定要启用用户' + user.name + "吗?", user.name, {
@@ -153,32 +153,41 @@
                   this.$message({
                       message: response.msg,
                       type: 'success'
-                  });
+                  })
                   this.fetchUsers();
-              });
+              })
           }).catch(() => {
               this.$message({
                   type: 'info',
                   message: '已取消操作'
-              });
-          });
+              })
+          })
       },
       showGrantAuth(user) {
-          this.selectedUser = user;
-          this.grantAuthFormVisible = true;
+          this.selectedUser = user
+          this.grantAuthFormVisible = true
       },
       grantAuth() {
-          this.grantAuthFormVisible = false;
-          let user = this.selectedUser;
-          console.log(this.$refs.resourceTree.getCheckedKeys());
+          this.grantAuthFormVisible = false
+          let userId = this.selectedUser.id
+          let resourceIdList = this.$refs.resourceTree.getCheckedKeys()
+          UserResourceApi.grantAuth({
+              userId: userId,
+              resourceIdList: resourceIdList
+          }).then(response => {
+              this.$message({
+                  message: response.msg,
+                  type: 'success'
+              })
+          })
       },
       handleSizeChange(size) {
-        this.condition.size = size;
-        this.fetchUsers();
+        this.condition.size = size
+        this.fetchUsers()
       },
       handleCurrentChange(page) {
-        this.condition.page = page;
-        this.fetchUsers();
+        this.condition.page = page
+        this.fetchUsers()
       }
     }
   }
