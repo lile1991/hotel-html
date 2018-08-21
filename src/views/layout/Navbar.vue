@@ -102,17 +102,18 @@
             clickTab(tab) {
                 this.$router.push({path: tab.name})
             },
-            removeTab(targetName) {
-                let tabs = this.$store.app.tabs
+            removeTab(path) {
+                let tabs = this.$store.getters.tabs
                 tabs.forEach((tab, index) => {
-                    if (tab.name === targetName) {
+                    if (tab.path === path) {
                         // 移除Tab
-                        this.$store.commit('REMOVE_TAB', targetName)
+                        this.$store.commit('REMOVE_TAB', path)
 
                         // 选中下一个Tab
-                        let nextTab = tabs[index + 1] || tabs[index - 1];
+                        let nextTab = tabs[index + 1] || tabs[index - 1]
                         if (nextTab) {
-                            this.activeTabName = nextTab.name;
+                            this.activeTabName = nextTab.name
+                            this.clickTab({name: nextTab.path})
                         }
                     }
                     return false

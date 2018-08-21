@@ -19,8 +19,8 @@ const app = {
     ADD_TAB: (state, newTab) => {
         state.tabs.push(newTab);
     },
-    REMOVE_TAB: (state, targetName) => {
-        state.tabs = state.tabs.filter(tab => tab.name !== targetName)
+    REMOVE_TAB: (state, path) => {
+        state.tabs = state.tabs.filter(tab => tab.path !== path)
     }
   },
   actions: {
